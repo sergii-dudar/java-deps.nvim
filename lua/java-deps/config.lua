@@ -12,6 +12,7 @@ local M = {
     position = "right",
     wrap = false,
     hierarchical_view = true,
+    show_non_java_resources = false,
     keymaps = {
       close = "q",
       toggle_fold = "o",

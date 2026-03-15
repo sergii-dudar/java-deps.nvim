@@ -45,7 +45,7 @@ M.getPackageData = function(params)
   ---@type INodeData[]
   local nodeDatas = node_data.generateNodeList(resp)
   -- Filter out non java resources
-  if true then
+  if not require("java-deps.config").options.show_non_java_resources then
     nodeDatas = vim.tbl_filter(function(data)
       return data.kind ~= NodeKind.Folder and data.kind ~= NodeKind.File
     end, nodeDatas)
