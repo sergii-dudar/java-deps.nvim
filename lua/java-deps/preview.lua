@@ -73,7 +73,7 @@ end
 
 local function setup_preview_buf()
   local code_buf = vim.api.nvim_win_get_buf(jd.state.code_win)
-  local ft = vim.api.nvim_buf_get_option(code_buf, "filetype")
+  local ft = vim.api.nvim_get_option_value("filetype", { buf = code_buf })
 
   local function treesitter_attach()
     local ts_highlight = require("nvim-treesitter.highlight")
@@ -84,9 +84,9 @@ local function setup_preview_buf()
   -- user might not have tree sitter installed
   pcall(treesitter_attach)
 
-  vim.api.nvim_buf_set_option(state.preview_buf, "syntax", ft)
-  vim.api.nvim_buf_set_option(state.preview_buf, "bufhidden", "delete")
-  vim.api.nvim_win_set_option(state.preview_win, "cursorline", true)
+  vim.api.nvim_set_option_value("syntax", ft, { buf = state.preview_buf })
+  vim.api.nvim_set_option_value("bufhidden", "delete", { buf = state.preview_buf })
+  vim.api.nvim_set_option_value("cursorline", true, { win = state.preview_win })
   update_preview(code_buf)
 end
 
@@ -138,12 +138,10 @@ local function update_hover()
     { kind = "markdown", value = "[" .. node.name .. "](" .. node.path .. ")" },
   }
   local markdown_lines = vim.lsp.util.convert_input_to_markdown_lines(mdstring)
-  markdown_lines = vim.lsp.util.trim_empty_lines(markdown_lines)
+  markdown_lines = vim.split(table.concat(markdown_lines, "\n"), "\n", { plain = true, trimempty = true })
   if vim.tbl_isempty(markdown_lines) then
     markdown_lines = { "###No info available!" }
   end
-
-  markdown_lines = vim.lsp.util.stylize_markdown(state.hover_buf, markdown_lines, {})
 
   if state.hover_buf ~= nil then
     vim.api.nvim_buf_set_lines(state.hover_buf, 0, -1, 0, markdown_lines)
@@ -155,21 +153,24 @@ local function setup_hover_buf()
     return
   end
   -- local code_buf = vim.api.nvim_win_get_buf(jd.state.code_win)
-  -- local ft = vim.api.nvim_buf_get_option(code_buf, "filetype")
-  -- vim.api.nvim_buf_set_option(state.hover_buf, "syntax", "xml")
-  vim.api.nvim_buf_set_option(state.hover_buf, "bufhidden", "delete")
-  vim.api.nvim_win_set_option(state.hover_win, "wrap", true)
-  vim.api.nvim_win_set_option(state.hover_win, "cursorline", false)
+  -- local ft = vim.api.nvim_get_option_value("filetype", { buf = code_buf })
+  -- vim.api.nvim_set_option_value("syntax", "xml", { buf = state.hover_buf })
+  vim.api.nvim_set_option_value("filetype", "markdown", { buf = state.hover_buf })
+  vim.api.nvim_set_option_value("bufhidden", "delete", { buf = state.hover_buf })
+  vim.api.nvim_set_option_value("wrap", true, { win = state.hover_win })
+  vim.api.nvim_set_option_value("conceallevel", 2, { win = state.hover_win })
+  vim.api.nvim_set_option_value("cursorline", false, { win = state.hover_win })
+  pcall(vim.treesitter.start, state.hover_buf, "markdown")
   update_hover()
 end
 
 local function set_bg_hl()
   local winhi = "Normal:" .. config.options.preview_bg_highlight
-  -- vim.api.nvim_win_set_option(state.preview_win, "winhighlight", winhi)
-  vim.api.nvim_win_set_option(state.hover_win, "winhighlight", winhi)
+  -- vim.api.nvim_set_option_value("winhighlight", winhi, { win = state.preview_win })
+  vim.api.nvim_set_option_value("winhighlight", winhi, { win = state.hover_win })
   local winblend = config.options.winblend
-  -- vim.api.nvim_win_set_option(state.preview_win, "winblend", winblend)
-  vim.api.nvim_win_set_option(state.hover_win, "winblend", winblend)
+  -- vim.api.nvim_set_option_value("winblend", winblend, { win = state.preview_win })
+  vim.api.nvim_set_option_value("winblend", winblend, { win = state.hover_win })
 end
 
 
