@@ -33,7 +33,7 @@ M.execute_command_async = function(command, callback, bufnr)
       end
     end
   end
-  client.request("workspace/executeCommand", command, callback, bufnr)
+  client:request("workspace/executeCommand", command, callback, bufnr)
   if co then
     return coroutine.yield()
   end
@@ -43,7 +43,7 @@ M.execute_command = function(command, bufnr)
   if not client then
     return
   end
-  local resp = client.request_sync("workspace/executeCommand", command, 20000, bufnr)
+  local resp = client:request_sync("workspace/executeCommand", command, 20000, bufnr)
   if not resp then
     return "No response"
   end

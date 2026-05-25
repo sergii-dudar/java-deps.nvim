@@ -6,7 +6,7 @@ local M = {}
 local function is_buffer_outline(bufnr)
   local isValid = vim.api.nvim_buf_is_valid(bufnr)
   local name = vim.api.nvim_buf_get_name(bufnr)
-  local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+  local ft = vim.api.nvim_get_option_value("filetype", { buf = bufnr })
   return string.match(name, "JavaProjects") ~= nil and ft == "JavaProjects" and isValid
 end
 
@@ -14,9 +14,9 @@ function M.write_outline(bufnr, lines)
   if not is_buffer_outline(bufnr) then
     return
   end
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", true)
+  vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-  vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
+  vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
 end
 
 ---@param bufnr integer

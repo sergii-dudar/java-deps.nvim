@@ -18,6 +18,20 @@ local function table_to_str(t)
   return ret
 end
 
+---@param line_number integer
+---@param parts string[]
+---@param hl_info table
+local function add_prefix_highlights(line_number, parts, hl_info)
+  local col = 0
+  for _, part in ipairs(parts) do
+    local start_col, end_col = part:find("%S+")
+    if start_col ~= nil and end_col ~= nil then
+      table.insert(hl_info, { line_number, col + start_col - 1, col + end_col, "JavaDepsLineGuide" })
+    end
+    col = col + #part
+  end
+end
+
 local guides = {
   markers = {
     bottom = "└",
@@ -66,11 +80,8 @@ function M.get_lines(flattened_outline_items)
       line[index] = line[index] .. " "
     end
 
-    local string_prefix = ""
-
-    for _, value in ipairs(line) do
-      string_prefix = string_prefix .. tostring(value)
-    end
+    local string_prefix = table_to_str(line)
+    add_prefix_highlights(node_line, line, hl_info)
 
     local hl_icon = icons.get_icon(node.data)
     local icon = hl_icon.icon
@@ -78,7 +89,7 @@ function M.get_lines(flattened_outline_items)
 
     local hl_start = #string_prefix
     local hl_end = #string_prefix + #icon
-    local hl_type = hl_icon.hl or "Type"
+    local hl_type = hl_icon.hl or config.options.symbols.highlights.default_icon or "Type"
     table.insert(hl_info, { node_line, hl_start, hl_end, hl_type })
     node.prefix_length = #string_prefix + #icon + 1
   end

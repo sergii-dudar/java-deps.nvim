@@ -13,11 +13,49 @@
     ft = "java",
     dependencies = "mfussenegger/nvim-jdtls",
     config = function()
-      require("java-deps").setup({})
+      require("java-deps").setup({
+        symbols = {
+          icons = {
+            NodeKind = {
+              -- project 节点改成文件夹图标
+              Project = "󰉋",
+              -- 也支持同时覆盖 icon 和高亮
+              Workspace = { icon = "󱁐", hl = "Directory" },
+            },
+            TypeKind = {
+              Class = "󰌗",
+              Interface = { icon = "", hl = "Function" },
+            },
+          },
+          highlights = {
+            default_icon = "Identifier",
+            NodeKind = {
+              File = "Directory",
+              Package = "Directory",
+            },
+          },
+        },
+        highlights = {
+          LineGuide = { link = "Comment" },
+        },
+      })
     end,
   }
 
 ```
+
+可配置项说明：
+
+- `symbols.icons.<分类>.<枚举名>`: 覆盖图标，值可以是字符串，或者 `{ icon = "...", hl = "..." }`
+- `symbols.highlights.default_icon`: 没有单独指定时，图标默认使用的高亮组
+- `symbols.highlights.<分类>.<枚举名>`: 仅覆盖某个图标的高亮组
+- `highlights.LineGuide`: 定义 `JavaDepsLineGuide` 高亮组
+
+目前支持的分类：
+
+- `symbols.icons.NodeKind`: `Workspace` `Project` `PackageRoot` `Package` `PrimaryType` `CompilationUnit` `ClassFile` `Container` `Folder` `File`
+- `symbols.icons.TypeKind`: `Class` `Interface` `Enum`
+- `symbols.icons.EntryKind`: `K_SOURCE` `K_BINARY`
 
 - 手动编译 `vscode-java-dependency` (可选)
 
